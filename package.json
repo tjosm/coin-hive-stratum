@@ -1,15 +1,15 @@
 {
   "name": "coin-hive-stratum",
-  "version": "2.5.8",
+  "version": "2.6.11",
   "description": "proxy to use CoinHive miner on any stratum pool",
   "main": "build",
   "typings": "build/typings/index.d.ts",
   "scripts": {
-    "start": "`npm bin`/watch 'npm run build' src",
     "clear:build": "rm -rf ./build && mkdir build",
     "build:js": "`npm bin`/tsc -p tsconfig.json",
     "build": "npm run clear:build && npm run build:js",
-    "now-start": "./bin/coin-hive-stratum 8892 --dynamic-pool",
+    "start": "npm run build && node server",
+    "now-start": "node server",
     "prepublish": "npm run build"
   },
   "repository": {

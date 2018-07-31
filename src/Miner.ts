@@ -15,7 +15,7 @@ import {
   StratumRequestParams,
   StratumError,
   StratumJob
-} from "src/types";
+} from "./types";
 
 export type Options = {
   connection: Connection | null;
@@ -121,7 +121,7 @@ class Miner extends EventEmitter {
 
   sendToMiner(payload: CoinHiveResponse) {
     const coinhiveMessage = JSON.stringify(payload);
-    if (this.online) {
+    if (this.online && this.ws.readyState === WebSocket.OPEN) {
       try {
         this.ws.send(coinhiveMessage);
       } catch (e) {
@@ -202,15 +202,19 @@ class Miner extends EventEmitter {
       `pool connection error (${this.id}):`,
       error.error || (error && JSON.stringify(error)) || "unknown error"
     );
-    this.sendToMiner({
-      type: "error",
-      params: error
-    });
-    this.emit("error", {
-      id: this.id,
-      login: this.login,
-      error
-    });
+    if (this.online) {
+      if (error.error === "invalid_site_key") {
+        this.sendToMiner({
+          type: "error",
+          params: error
+        });
+      }
+      this.emit("error", {
+        id: this.id,
+        login: this.login,
+        error
+      });
+    }
     this.kill();
   }
 
